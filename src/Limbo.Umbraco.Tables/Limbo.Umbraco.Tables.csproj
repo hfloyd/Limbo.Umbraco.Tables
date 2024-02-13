@@ -50,6 +50,10 @@
   <!-- Generate XML documentation -->
   <PropertyGroup>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Version>$(VersionPrefix)-hlf-$(VersionSuffix)</Version>
   </PropertyGroup>
+
+<Import Project="..\..\Custom.targets" />
 
 </Project>
