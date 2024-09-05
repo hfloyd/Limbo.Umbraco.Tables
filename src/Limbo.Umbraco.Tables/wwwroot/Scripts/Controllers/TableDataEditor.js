@@ -253,6 +253,57 @@
 
 	}
 
+ //editRawValue capabilities adapted from https://github.com/leekelleher/umbraco-contentment/blob/dev/v4.x/src/Umbraco.Community.Contentment/DataEditors/Notes/notes.js
+        // & from https://github.com/leekelleher/umbraco-contentment/blob/dev/v4.x/src/Umbraco.Community.Contentment/DataEditors/_/_dev-mode.js */
+    function editRawTableData() {
+        const o = {
+            view: "/App_Plugins/Limbo.Umbraco.Tables/Views/_json-editor.html",
+            show: true,
+            title: "Edit raw value",
+            size: "medium",
+            value: Utilities.toJson($scope.model.value, true),
+            ace: {
+                showGutter: true,
+                useWrapMode: true,
+                useSoftTabs: true,
+                theme: "chrome",
+                mode: "javascript",
+                advanced: {
+                    fontSize: "14px",
+                    wrap: true
+                }
+                //onLoad: function (_editor) {
+                //    $timeout(() => _editor.focus());
+                //}
+            },
+            submit: function (value) {
+
+                    if (value=="") 
+                    {
+                    $scope.model.value = value;
+                    initTable();
+                } else {
+                    $scope.model.value = Utilities.fromJson(value);
+                    loadTable();
+                }
+
+                editorService.close();
+
+            },
+
+            close: function () {
+                editorService.close();
+            }
+        };
+
+        editorService.open(o);
+
+        localizationService.localize("limboTables_editRawValue").then(function (value) {
+            o.title = value;
+        });
+    };
+
+
 	function save() {
 
 		// Re-index all the cells
@@ -286,12 +337,29 @@
 		vm.addRow();
 	}
 
-	function init() {
-		initTable();
-		if ($routeParams.id !== "-1") loadTable();
-		$scope.$on("formSubmitting", save);
-	}
+    function init() {
+        initTable();
+        if ($routeParams.id !== "-1") loadTable();
 
-	init();
+        if ($scope.model.config.enableDevMode === true && $scope.umbProperty) {
+            $scope.umbProperty.setPropertyActions([
+                //{
+                //    labelKey: "limboTables_editRawValue",
+                //    icon: "brackets",
+                //    method: () => devModeService.editValue($scope.model, setDirty)
+                //}
+                {
+                    labelKey: "limboTables_editRawValue",
+                    icon: "brackets",
+                    method: () => editRawTableData()
+                }
+            ]);
+
+        }
+
+        $scope.$on("formSubmitting", save);
+    }
+
+    init();
 
 });
